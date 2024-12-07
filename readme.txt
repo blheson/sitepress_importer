@@ -1,0 +1,1 @@
+PLUGIN_SLUG . '_import_progress_action': Keeps track of the importers exact last action
