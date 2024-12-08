@@ -7,6 +7,7 @@
  * Author: Blessing Udor
  * Author_url: blessingudor.com
  * License: GPL
+ * PHP requires at least: 7.4.0
  */
 
 defined( 'ABSPATH' ) || die( 'No script kiddies please!' );

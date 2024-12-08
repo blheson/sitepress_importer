@@ -83,16 +83,25 @@ class SITEPRESS_IMPORTER_MENU {
 			</div>
 
 			<div id="response-message"></div>
-			<div>
+			<hr>
+
+			<div style="margin-top: 20px;">
 				<span id="siteimporter-reset">Reset</span>
 			</div>
 			<style>
 				.page-csv-box {
-					margin-top: 30px;
+					margin-top: 20px;
 				}
 
 				.form-section {
 					display: none;
+				}
+				#siteimporter-reset{
+					background-color: red;
+					color:#fff;
+					padding: 10px;
+					border-radius: 3px;
+					cursor: pointer;
 				}
 			</style>
 		</div>
