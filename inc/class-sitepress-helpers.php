@@ -53,8 +53,8 @@ class SITEPRESS_IMPORTER_HELPERS {
 		file_put_contents( $file_path, $csv_content ); // Save the file
 
 		// Save the URL to wp-options
-		$file_url = $upload_dir['url'] . '/' . $file_name;
+		// $file_url = $upload_dir['url'] . '/' . $file_name;
 
-		return $file_url;
+		return $file_path;
 	}
 }

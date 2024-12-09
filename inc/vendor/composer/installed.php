@@ -1,0 +1,41 @@
+<?php return array(
+    'root' => array(
+        'name' => 'blessingudor/inc',
+        'pretty_version' => '1.0.1.x-dev',
+        'version' => '1.0.1.9999999-dev',
+        'reference' => '6a917146b4262eecc7ce130d7b69235cac3d4d0c',
+        'type' => 'library',
+        'install_path' => __DIR__ . '/../../',
+        'aliases' => array(),
+        'dev' => true,
+    ),
+    'versions' => array(
+        'blessingudor/inc' => array(
+            'pretty_version' => '1.0.1.x-dev',
+            'version' => '1.0.1.9999999-dev',
+            'reference' => '6a917146b4262eecc7ce130d7b69235cac3d4d0c',
+            'type' => 'library',
+            'install_path' => __DIR__ . '/../../',
+            'aliases' => array(),
+            'dev_requirement' => false,
+        ),
+        'league/csv' => array(
+            'pretty_version' => '9.8.0',
+            'version' => '9.8.0.0',
+            'reference' => '9d2e0265c5d90f5dd601bc65ff717e05cec19b47',
+            'type' => 'library',
+            'install_path' => __DIR__ . '/../league/csv',
+            'aliases' => array(),
+            'dev_requirement' => false,
+        ),
+        'mtownsend/xml-to-array' => array(
+            'pretty_version' => '2.0.0',
+            'version' => '2.0.0.0',
+            'reference' => '0734720a8462dba36d90fb8b2723bf46af0091f4',
+            'type' => 'library',
+            'install_path' => __DIR__ . '/../mtownsend/xml-to-array',
+            'aliases' => array(),
+            'dev_requirement' => false,
+        ),
+    ),
+);
