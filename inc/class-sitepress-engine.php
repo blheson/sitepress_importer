@@ -12,19 +12,9 @@ if ( class_exists( 'SITEPRESS_IMPORTER_ENGINE' ) ) {
 
 use League\Csv\Reader;
 use League\Csv\Statement;
+use Mtownsend\XmlToArray\XmlToArray;
 
 class SITEPRESS_IMPORTER_ENGINE {
-
-
-
-
-
-
-
-
-
-
-
 
 
 
@@ -33,7 +23,7 @@ class SITEPRESS_IMPORTER_ENGINE {
 
 	public static $csv_reader = null;
 	public function __construct() {
-		 add_action( 'wp_ajax_process_csv', array( $this, ST_IMP_PLUGIN_SLUG . '_process_csv' ) );
+		add_action( 'wp_ajax_process_csv', array( $this, ST_IMP_PLUGIN_SLUG . '_process_csv' ) );
 		add_action( 'wp_ajax_sitepress_importer_load_import_process', array( $this, ST_IMP_PLUGIN_SLUG . '_load_import_process' ) );
 		// Enqueue JavaScript for AJAX
 		add_action( 'admin_enqueue_scripts', array( $this, ST_IMP_PLUGIN_SLUG . '_enqueue_scripts' ) );
@@ -43,7 +33,8 @@ class SITEPRESS_IMPORTER_ENGINE {
 	}
 
 	public static function instantiate( $args = array() ) {
-		require_once ST_IMP_PATH . 'inc/vendor/league/csv/autoload.php';
+		// require_once ST_IMP_PATH . 'inc/vendor/league/csv/autoload.php';
+		require_once ST_IMP_PATH . 'inc/vendor/autoload.php';
 
 		if ( self::$single_instance === null ) {
 			self::$args            = $args;
@@ -89,8 +80,8 @@ class SITEPRESS_IMPORTER_ENGINE {
 	 * @return void
 	 */
 	function sitepress_importer_cron_action() {
-		 $template_csv_url = get_option( 'template_csv_file_url' );
-		$page_csv_url      = get_option( 'page_csv_file_url' );
+		$template_csv_url = get_option( 'template_csv_file_url' );
+		$page_csv_url     = get_option( 'page_csv_file_url' );
 
 		if ( empty( $template_csv_url ) ) {
 			$template_csv_content = file_get_contents( $template_csv_url );
@@ -177,7 +168,7 @@ class SITEPRESS_IMPORTER_ENGINE {
 			}
 
 			// Iterate through filtered records
-			SITEPRESS_IMPORTER_HELPERS::extend_update_option( ST_IMP_PLUGIN_SLUG . '_import_progress_message', 'Progress: n/nn items processed', 'append' );
+			// SITEPRESS_IMPORTER_HELPERS::extend_update_option( ST_IMP_PLUGIN_SLUG . '_import_progress_message', 'Progress: n/nn items processed', 'append' );
 
 			foreach ( $records as $record ) {
 				if ( $progress_action['id'] >= $record['ID'] ) {
@@ -252,6 +243,16 @@ class SITEPRESS_IMPORTER_ENGINE {
 
 			wp_die();
 		}
+		$post_data = array(
+			'post_type'      => 'sitepress_template', // Set the custom post type
+			'posts_per_page' => -1,
+		);
+
+		$templates        = get_posts( $post_data );
+		$mapped_templates = array();
+		foreach ( $templates as $template ) {
+			$mapped_templates[ $template->post_title ] = $template;
+		}
 		foreach ( $records as $record ) {
 			if ( $progress_action['id'] >= $record['ID'] ) {
 				// Skip already processed records
@@ -266,8 +267,9 @@ class SITEPRESS_IMPORTER_ENGINE {
 
 			$template_post = $this->get_post_id_by_sitepress_template_id( $record['TemplateID'] );
 
-			$post_content_build = $template_post->post_content;
-			$post_data          = array(
+			$post_content_build = $this->fill_template_with_content( $template_post->post_content, $record['PageContent'], $mapped_templates );
+
+			$post_data = array(
 				'post_title'   => $record['PageTitle'], // Set the page title
 				'post_content' => wp_kses_post( $post_content_build ), // Set the page content
 				'post_status'  => 'publish', // Set the post status
@@ -297,7 +299,7 @@ class SITEPRESS_IMPORTER_ENGINE {
 		SITEPRESS_IMPORTER_HELPERS::extend_update_option( ST_IMP_PLUGIN_SLUG . '_import_progress_message', 'Data successfully imported', 'append' );
 	}
 	function sitepress_importer_process_csv() {
-		 // @todo - do proper check
+		// @todo - do proper check
 		if ( isset( $_FILES['template_csv_file'] ) && ! empty( $_FILES['template_csv_file']['tmp_name'] ) ) {
 			$template_csv_content = file_get_contents( $_FILES['template_csv_file']['tmp_name'] );
 			$page_csv_content     = file_get_contents( $_FILES['page_csv_file']['tmp_name'] );
@@ -332,7 +334,7 @@ class SITEPRESS_IMPORTER_ENGINE {
 			ST_IMP_PLUGIN_SLUG . '_import_progress_action'
 		);
 		$args = array(
-			'post_type'      => array( 'post', 'page' ), // Specify post types
+			'post_type'      => array( 'post', 'page', 'sitepress_template' ), // Specify post types
 			'meta_query'     => array(
 				'relation' => 'OR',
 				array(
@@ -393,4 +395,91 @@ class SITEPRESS_IMPORTER_ENGINE {
 		$post_ids = get_posts( $args );
 		return ! empty( $post_ids ) ? $post_ids[0] : null; // Return the first post ID or null if not found
 	}
+
+	function fill_template_with_content( $template, $xml_content, $template_formats ) {
+		// Load the XML content using DOMDocument
+		$dom                     = new DOMDocument( '1.0', 'utf-8' );
+		$dom->preserveWhiteSpace = false;
+		$dom->formatOutput       = true;
+		$dom->recover            = true;
+		libxml_use_internal_errors( true );
+		$dom->loadXML( $xml_content );
+
+		// Prepare an associative array to hold the content areas
+		$content_areas     = array();
+		$content_areas_obj = $dom->getElementsByTagName( 'ContentArea' );
+		$template          = $this->extract_template_names( $template, $template_formats );
+		// Loop through each ContentArea in the DOM and store it in the array
+		foreach ( $content_areas_obj  as $content_area_obj ) {
+			$name                   = $content_area_obj->getElementsByTagName( 'Name' )->item( 0 )->nodeValue;
+			$content                = $content_area_obj->getElementsByTagName( 'Content' )->item( 0 )->nodeValue;
+			$content_areas[ $name ] = htmlspecialchars_decode( $content ); // Decode HTML entities
+		}
+		$indx = 0;
+		// Replace placeholders in the template with actual content
+		foreach ( $content_areas as $name => $content ) {
+			$indx++;
+			$template = str_replace( "{{CONTENTAREA:$name:Index=$indx}}", $content, $template );
+		}
+		error_log( $template );
+
+		return $template;
+	}
+	function extract_template_names( $template, $template_formats, $count = 0 ) {
+		$pattern        = '/{{INCLUDE_TEMPLATE:([^}]+)}}/';
+		$matches        = array();
+		$template_names = array();
+		if ( $count > 20 ) {
+			return $template;
+		}
+		if ( ! preg_match_all( $pattern, $template, $matches ) ) {
+
+			return $template;
+		}
+		$template_names = $matches[1];
+
+		foreach ( $template_names as $key => $value ) {
+			if ( isset( $template_formats[ $value ] ) ) {
+				try {
+					$template = str_replace( "{{INCLUDE_TEMPLATE:$value}}", $template_formats[ $value ]->post_content, $template );
+				} catch ( \Throwable $th ) {
+				}
+			}
+		}
+		$count++;
+		return $this->extract_template_names( $template, $template_formats, $count );
+	}
+
+	// function fill_template_with_content( $template, $xml_content ) {
+	// try {
+	// Load the XML content using XMLReader
+	// $reader = new XMLReader();
+	// $reader->xml( $xml_content );
+	// $loaded = simplexml_load_string( $xml_content );
+	// $array  = XmlToArray::convert( $xml_content );
+	// Prepare an associative array to hold the content areas
+	// $content_areas = array();
+
+	// Loop through each ContentArea in the XML
+	// while ( $reader->read() ) {
+	// if ( $reader->nodeType == XMLReader::ELEMENT && $reader->localName == 'ContentArea' ) {
+	// $content_area           = new SimpleXMLElement( $reader->readOuterXML() );
+	// $name                   = (string) $content_area->Name;
+	// $content                = (string) $content_area->Content;
+	// $content_areas[ $name ] = htmlspecialchars_decode( $content ); // Decode HTML entities
+	// }
+	// }
+	// $reader->close();
+
+	// Replace placeholders in the template with actual content
+	// foreach ( $content_areas as $name => $content ) {
+	// $template = str_replace( "{{CONTENTAREA:$name}}", $content, $template );
+	// }
+	// return $template;
+	// } catch ( \Throwable $th ) {
+	// throw new Exception( 'Error Processing Request', 1 );
+
+	// }
+
+	// }
 }

@@ -2,7 +2,7 @@ jQuery(document).ready(function ($) {
     function sitepress_trigger_poll() {
         setInterval(() => {
             get_progress_report()
-        }, 2000)
+        }, 1000)
     }
     $('#csv-upload-form').on('submit', function (e) {
         e.preventDefault(); // Prevent the default form submission

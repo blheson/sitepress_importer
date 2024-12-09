@@ -8,9 +8,14 @@ class ComposerStaticInit4e3667c2476e9d2bd101af3898a8eb63
 {
     public static $files = array (
         '9e4824c5afbdc1482b6025ce3d4dfde8' => __DIR__ . '/..' . '/league/csv/src/functions_include.php',
+        '029bffbd721800038bcfaf4916fa491c' => __DIR__ . '/..' . '/mtownsend/xml-to-array/src/helpers.php',
     );
 
     public static $prefixLengthsPsr4 = array (
+        'M' => 
+        array (
+            'Mtownsend\\XmlToArray\\' => 21,
+        ),
         'L' => 
         array (
             'League\\Csv\\' => 11,
@@ -22,6 +27,10 @@ class ComposerStaticInit4e3667c2476e9d2bd101af3898a8eb63
     );
 
     public static $prefixDirsPsr4 = array (
+        'Mtownsend\\XmlToArray\\' => 
+        array (
+            0 => __DIR__ . '/..' . '/mtownsend/xml-to-array/src',
+        ),
         'League\\Csv\\' => 
         array (
             0 => __DIR__ . '/..' . '/league/csv/src',

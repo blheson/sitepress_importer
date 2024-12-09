@@ -4,7 +4,7 @@
         "Read more about it at https://getcomposer.org/doc/01-basic-usage.md#installing-dependencies",
         "This file is @generated automatically"
     ],
-    "content-hash": "baffe5bdf8473ed8651f72502e65f633",
+    "content-hash": "5394aedfd5d46a8b681e5755e246634a",
     "packages": [
         {
             "name": "league/csv",
@@ -89,6 +89,59 @@
                 }
             ],
             "time": "2022-01-04T00:13:07+00:00"
+        },
+        {
+            "name": "mtownsend/xml-to-array",
+            "version": "2.0.0",
+            "source": {
+                "type": "git",
+                "url": "https://github.com/mtownsend5512/xml-to-array.git",
+                "reference": "0734720a8462dba36d90fb8b2723bf46af0091f4"
+            },
+            "dist": {
+                "type": "zip",
+                "url": "https://api.github.com/repos/mtownsend5512/xml-to-array/zipball/0734720a8462dba36d90fb8b2723bf46af0091f4",
+                "reference": "0734720a8462dba36d90fb8b2723bf46af0091f4",
+                "shasum": ""
+            },
+            "require": {
+                "php": "~7.0|~8.0"
+            },
+            "require-dev": {
+                "phpunit/phpunit": "^6.4"
+            },
+            "type": "library",
+            "autoload": {
+                "files": [
+                    "src/helpers.php"
+                ],
+                "psr-4": {
+                    "Mtownsend\\XmlToArray\\": "src"
+                }
+            },
+            "notification-url": "https://packagist.org/downloads/",
+            "license": [
+                "MIT"
+            ],
+            "authors": [
+                {
+                    "name": "Mark Townsend",
+                    "email": "mtownsend5512@gmail.com",
+                    "role": "Developer"
+                }
+            ],
+            "description": "Easily convert valid xml to a php array.",
+            "keywords": [
+                "array",
+                "convert",
+                "laravel",
+                "xml"
+            ],
+            "support": {
+                "issues": "https://github.com/mtownsend5512/xml-to-array/issues",
+                "source": "https://github.com/mtownsend5512/xml-to-array/tree/2.0.0"
+            },
+            "time": "2021-02-27T22:39:18+00:00"
         }
     ],
     "packages-dev": [],

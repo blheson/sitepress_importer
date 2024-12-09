@@ -12,6 +12,7 @@
         }
     ],
     "require": {
-        "league/csv": "9.8.0"
+        "league/csv": "9.8.0",
+        "mtownsend/xml-to-array": "^2.0"
     }
 }
